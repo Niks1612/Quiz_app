@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Rules</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url("images/bg.jpg");
+            background-size: cover;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .quiz-rules-container {
+            max-width: 500px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .quiz-rules-container ol {
+            text-align: left;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .exit-quiz-button,
+        .start-quiz-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .exit-quiz-button:hover,
+        .start-quiz-button:hover {
+            background-color: #2575ad;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-rules-container">
+    <h2>Quiz Rules</h2>
+    <p>Welcome to the quiz! Before you start, please read and understand the following rules:</p>
+    
+    <ol>
+        <li>There are multiple-choice questions in this quiz.</li>
+        <li>Each question has a time limit, so answer quickly.</li>
+        <li>Once you select an answer, it cannot be changed.</li>
+        <li>At the end of the quiz, you will see your score and feedback.</li>
+    </ol>
+
+    <div class="button-container">
+        <button class="exit-quiz-button" onclick="exitQuiz()">Exit Quiz</button>
+        <button class="start-quiz-button" onclick="continueQuiz()">Continue</button>
+    </div>
+</div>
+
+<script>
+    function continueQuiz() {
+        window.location.href = 'categories.html';
+    }
+
+    function exitQuiz() {
+        window.location.href = 'index.html';
+    }
+</script>
+
+</body>
+</html>

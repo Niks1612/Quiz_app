@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz Home Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url("images/bg.jpg");
+            background-size: cover;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #home-container {
+            max-width: 500px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        #start-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        #start-button:hover {
+            background-color: #2575ad;
+        }
+
+        #quiz-guide-container {
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #continue-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        #continue-button:hover {
+            background-color: #2575ad;
+        }
+    </style>
+</head>
+<body>
+    <div id="home-container">
+        <h2>Welcome to the Quiz!</h2>
+        <button id="start-button" onclick="startQuiz()">Start Quiz</button>
+    </div>
+    
+    <div id="quiz-guide-container" style="display: none;">
+        <p>Quiz Guide: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget justo vel urna bibendum aliquet.</p>
+        <button id="continue-button" onclick="continueQuiz()">Continue</button>
+    </div>
+
+<script>
+    function startQuiz() {
+        window.location.href = 'quiz_rule.html';
+    }
+
+    function continueQuiz() {
+        window.location.href = 'category.html';
+    }
+</script>
+
+</body>
+</html>

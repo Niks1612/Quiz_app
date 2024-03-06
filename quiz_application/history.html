@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Quiz</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url("images/history.avif"); 
+            background-size: cover;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #quiz-container {
+            max-width: 500px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option {
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .option:hover {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        #progress-bar-container {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        #progress-bar {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            transition: width 1s ease-in-out;
+        }
+
+        #progress-bar-fill {
+            height: 100%;
+            width: 0;
+            background-color: #3498db;
+            border-radius: 5px;
+        }
+
+        #timer {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #888;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        #next-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        #next-button:hover {
+            background-color: #2575ad;
+        }
+
+        /* Optional: Add media query for responsiveness */
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add hover effect to the quiz container */
+        #quiz-container:hover {
+            transform: scale(1.05);
+        }
+
+        /* Add transition to progress bar fill */
+        #progress-bar-fill {
+            transition: width 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="question-container" class="question"></div>
+    <div id="options-container" class="options"></div>
+    <div id="progress-bar-container">
+        <div id="progress-bar">
+            <div id="progress-bar-fill"></div>
+        </div>
+    </div>
+    <div id="timer">Time Left: <span id="time">10</span> seconds</div>
+    <button id="next-button" onclick="nextQuestion()">Next</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    const questions = [
+    {
+        question: "In which year did Christopher Columbus reach the Americas?",
+        options: ["1492", "1505", "1520", "1485"],
+        correctAnswer: "1492"
+    },
+    {
+        question: "Who was the first President of the United States?",
+        options: ["John Adams", "Thomas Jefferson", "George Washington", "James Madison"],
+        correctAnswer: "George Washington"
+    },
+    {
+        question: "Which war was fought between the North and the South regions of the United States?",
+        options: ["Revolutionary War", "Civil War", "World War I", "Vietnam War"],
+        correctAnswer: "Civil War"
+    },
+    {
+        question: "What event marked the beginning of World War II?",
+        options: ["D-Day", "Pearl Harbor", "Battle of Stalingrad", "Atomic bombings of Hiroshima and Nagasaki"],
+        correctAnswer: "Pearl Harbor"
+    },
+    {
+        question: "Who was the first female Prime Minister of the United Kingdom?",
+        options: ["Margaret Thatcher", "Angela Merkel", "Theresa May", "Indira Gandhi"],
+        correctAnswer: "Margaret Thatcher"
+    },
+    {
+        question: "In which year did the Berlin Wall fall, symbolizing the end of the Cold War?",
+        options: ["1985", "1989", "1991", "1995"],
+        correctAnswer: "1989"
+    },
+    {
+        question: "What ancient civilization built the pyramids?",
+        options: ["Roman Empire", "Greek Empire", "Egyptian Empire", "Persian Empire"],
+        correctAnswer: "Egyptian Empire"
+    },
+    {
+        question: "Who was the leader of the Indian independence movement against British rule?",
+        options: ["Jawaharlal Nehru", "Mahatma Gandhi", "Subhas Chandra Bose", "Sardar Patel"],
+        correctAnswer: "Mahatma Gandhi"
+    },
+    {
+        question: "What is the Magna Carta?",
+        options: ["A treaty ending World War I", "A document limiting the powers of the monarch", "A scientific discovery", "An ancient manuscript"],
+        correctAnswer: "A document limiting the powers of the monarch"
+    },
+    {
+        question: "The Renaissance was a period of renewed interest in which aspects of culture?",
+        options: ["Art and Science", "War and Politics", "Religion and Philosophy", "Trade and Commerce"],
+        correctAnswer: "Art and Science"
+    }
+        
+    ];
+
+    let currentQuestionIndex;
+    let score;
+    let timeLeft;
+    let timerInterval;
+
+    const questionContainer = document.getElementById("question-container");
+    const optionsContainer = document.getElementById("options-container");
+    const progressBarFill = document.getElementById("progress-bar-fill");
+    const timerElement = document.getElementById("time");
+    const nextButton = document.getElementById("next-button");
+    const resultContainer = document.getElementById("result");
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        timeLeft = 10;
+        nextButton.style.display = "none";
+        randomizeQuestions();
+        updateProgressBar();
+        showQuestion();
+        startTimer();
+    }
+
+    function randomizeQuestions() {
+        questions.sort(() => Math.random() - 0.5);
+    }
+
+    function showQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionContainer.textContent = currentQuestion.question;
+
+        optionsContainer.innerHTML = "";
+        currentQuestion.options.forEach((option, index) => {
+            const optionElement = document.createElement("div");
+            optionElement.classList.add("option");
+            optionElement.textContent = option;
+            optionElement.addEventListener("click", () => checkAnswer(option));
+            optionsContainer.appendChild(optionElement);
+        });
+    }
+
+    function checkAnswer(selectedOption) {
+        clearInterval(timerInterval);
+
+        const currentQuestion = questions[currentQuestionIndex];
+        if (selectedOption === currentQuestion.correctAnswer) {
+            score++;
+        }
+
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+            startTimer();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        questionContainer.style.display = "none";
+        optionsContainer.style.display = "none";
+        nextButton.style.display = "none";
+        resultContainer.textContent = `Your Score: ${score} out of ${questions.length}`;
+    }
+
+    function startTimer() {
+        timeLeft = 10;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            updateProgressBar();
+
+            if (timeLeft === 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        timerElement.textContent = timeLeft;
+    }
+
+    function updateProgressBar() {
+        const progress = (10 - timeLeft) * (100 / 10);
+        progressBarFill.style.width = `${progress}%`;
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+            startTimer();
+        } else {
+            showResult();
+        }
+    }
+
+    startQuiz();
+</script>
+
+</body>
+</html>

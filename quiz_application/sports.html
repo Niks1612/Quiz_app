@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Quiz</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url("images/sports.jpg"); 
+            background-size: cover;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #quiz-container {
+            max-width: 500px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .question {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option {
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .option:hover {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        #progress-bar-container {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        #progress-bar {
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            transition: width 1s ease-in-out;
+        }
+
+        #progress-bar-fill {
+            height: 100%;
+            width: 0;
+            background-color: #3498db;
+            border-radius: 5px;
+        }
+
+        #timer {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #888;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        #next-button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        #next-button:hover {
+            background-color: #2575ad;
+        }
+
+        /* Optional: Add media query for responsiveness */
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add hover effect to the quiz container */
+        #quiz-container:hover {
+            transform: scale(1.05);
+        }
+
+        /* Add transition to progress bar fill */
+        #progress-bar-fill {
+            transition: width 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="question-container" class="question"></div>
+    <div id="options-container" class="options"></div>
+    <div id="progress-bar-container">
+        <div id="progress-bar">
+            <div id="progress-bar-fill"></div>
+        </div>
+    </div>
+    <div id="timer">Time Left: <span id="time">10</span> seconds</div>
+    <button id="next-button" onclick="nextQuestion()">Next</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    const questions = [
+    {
+        question: "Which country hosted the 2022 FIFA World Cup?",
+        options: ["Brazil", "Germany", "Qatar", "France"],
+        correctAnswer: "Qatar"
+    },
+    {
+        question: "Who won the gold medal in Men's 100m sprint at the 2021 Tokyo Olympics?",
+        options: ["Usain Bolt", "Justin Gatlin", "Andre De Grasse", "Trayvon Bromell"],
+        correctAnswer: "Andre De Grasse"
+    },
+    {
+        question: "Which tennis player holds the record for the most Grand Slam singles titles?",
+        options: ["Roger Federer", "Rafael Nadal", "Novak Djokovic", "Serena Williams"],
+        correctAnswer: "Novak Djokovic"
+    },
+    {
+        question: "In which city did the 2016 Summer Olympics take place?",
+        options: ["Rio de Janeiro", "London", "Beijing", "Tokyo"],
+        correctAnswer: "Rio de Janeiro"
+    },
+    {
+        question: "Who is the all-time leading scorer in NBA history?",
+        options: ["Michael Jordan", "Kareem Abdul-Jabbar", "LeBron James", "Kobe Bryant"],
+        correctAnswer: "Kareem Abdul-Jabbar"
+    },
+    {
+        question: "Which golfer is known as 'The Golden Bear'?",
+        options: ["Tiger Woods", "Phil Mickelson", "Rory McIlroy", "Jack Nicklaus"],
+        correctAnswer: "Jack Nicklaus"
+    },
+    {
+        question: "Which country won the UEFA Euro 2020 (played in 2021)?",
+        options: ["Italy", "England", "France", "Spain"],
+        correctAnswer: "Italy"
+    },
+    {
+        question: "Who is considered the 'G.O.A.T.' (Greatest of All Time) in women's tennis?",
+        options: ["Serena Williams", "Steffi Graf", "Martina Navratilova", "Chris Evert"],
+        correctAnswer: "Serena Williams"
+    },
+    {
+        question: "Which NFL team has won the most Super Bowl titles?",
+        options: ["New England Patriots", "Pittsburgh Steelers", "Dallas Cowboys", "San Francisco 49ers"],
+        correctAnswer: "Pittsburgh Steelers"
+    },
+    {
+        question: "In which sport would you perform a slam dunk?",
+        options: ["Soccer", "Basketball", "Tennis", "Golf"],
+        correctAnswer: "Basketball"
+    }
+        
+    ];
+
+    let currentQuestionIndex;
+    let score;
+    let timeLeft;
+    let timerInterval;
+
+    const questionContainer = document.getElementById("question-container");
+    const optionsContainer = document.getElementById("options-container");
+    const progressBarFill = document.getElementById("progress-bar-fill");
+    const timerElement = document.getElementById("time");
+    const nextButton = document.getElementById("next-button");
+    const resultContainer = document.getElementById("result");
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        timeLeft = 10;
+        nextButton.style.display = "none";
+        randomizeQuestions();
+        updateProgressBar();
+        showQuestion();
+        startTimer();
+    }
+
+    function randomizeQuestions() {
+        questions.sort(() => Math.random() - 0.5);
+    }
+
+    function showQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionContainer.textContent = currentQuestion.question;
+
+        optionsContainer.innerHTML = "";
+        currentQuestion.options.forEach((option, index) => {
+            const optionElement = document.createElement("div");
+            optionElement.classList.add("option");
+            optionElement.textContent = option;
+            optionElement.addEventListener("click", () => checkAnswer(option));
+            optionsContainer.appendChild(optionElement);
+        });
+    }
+
+    function checkAnswer(selectedOption) {
+        clearInterval(timerInterval);
+
+        const currentQuestion = questions[currentQuestionIndex];
+        if (selectedOption === currentQuestion.correctAnswer) {
+            score++;
+        }
+
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+            startTimer();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        questionContainer.style.display = "none";
+        optionsContainer.style.display = "none";
+        nextButton.style.display = "none";
+        resultContainer.textContent = `Your Score: ${score} out of ${questions.length}`;
+    }
+
+    function startTimer() {
+        timeLeft = 10;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            updateProgressBar();
+
+            if (timeLeft === 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        timerElement.textContent = timeLeft;
+    }
+
+    function updateProgressBar() {
+        const progress = (10 - timeLeft) * (100 / 10);
+        progressBarFill.style.width = `${progress}%`;
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+            startTimer();
+        } else {
+            showResult();
+        }
+    }
+
+    startQuiz();
+</script>
+
+</body>
+</html>
